@@ -53,7 +53,7 @@ class Cron_Monitor_Run
 		}
 
 		add_action('admin_menu', array($this, 'cron_monitor_admin_menu'), 20);
-		// register_activation_hook(CRONMONITO_PLUGIN_FILE, array($this, 'activation_hook_callback'));
+		register_activation_hook(CRONMONITO_PLUGIN_FILE, array($this, 'activation_hook_callback'));
 		register_deactivation_hook(CRONMONITO_PLUGIN_FILE, array($this, 'deactivation_hook_callback'));
 
 		// Initialize the settings page
@@ -233,7 +233,8 @@ class Cron_Monitor_Run
 	 */
 	public function activation_hook_callback()
 	{
-		// Add code
+		$this->custom_log('Plugin has been activated. Cron job added.');
+		$this->add_cron_job();
 	}
 
 	/*
@@ -248,6 +249,7 @@ class Cron_Monitor_Run
 	{
 		// Remove the cron job
 		$this->remove_cron_job();
+		$this->custom_log('Plugin has been dectivated. Cron job removed.');
 	}
 
 	/**
@@ -283,12 +285,13 @@ class Cron_Monitor_Run
 		// Create the cron job
 		if (!wp_next_scheduled('cron_monitor_ping')) {
 			wp_schedule_event(time(), $cron_interval, 'cron_monitor_ping');
-			$this->custom_log('Cron job updated');
+			$this->custom_log('Cron job added/updated');
 		}
 	}
 
 	public function remove_cron_job()
 	{
+		$this->custom_log('Cron job removed');
 		// Remove the cron job
 		wp_clear_scheduled_hook('cron_monitor_ping');
 	}
@@ -348,4 +351,5 @@ class Cron_Monitor_Run
 		// // Write to log file
 		// file_put_contents($log_file_path, $current_time . ' - ' . $data . PHP_EOL, FILE_APPEND);
 	}
+
 }
